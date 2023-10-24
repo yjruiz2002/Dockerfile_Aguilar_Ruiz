@@ -7,9 +7,9 @@ RUN apt-get update -y \
     && . /opt/cn_p2_simple_ws/venv/bin/activate \
     && pip install gunicorn
 
-COPY . /cn_p2_simple_ws
+COPY . /opt/cn_p2_simple_ws
 
-WORKDIR /cn_p2_simple_ws
+WORKDIR /opt/cn_p2_simple_ws
 
 RUN . /opt/cn_p2_simple_ws/venv/bin/activate \
     && pip install .
@@ -26,7 +26,6 @@ RUN apt-get update -y \
     && useradd -r -M -u 5000 -g wsuser wsuser \
     && chown -R wsuser:wsuser /opt/cn_p2_simple_ws \
     && chmod +x /bin/entrypoint.sh
-    
 
 WORKDIR /opt/cn_p2_simple_ws
 USER wsuser:wsuser
