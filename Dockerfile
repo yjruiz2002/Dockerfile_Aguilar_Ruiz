@@ -1,35 +1,13 @@
-FROM python:3.11-slim as build
+FROM python:3.11-slim-buster
 
-RUN apt-get update -y \
-    && apt-get install -y build-essential libpq-dev git \
-    && pip install virtualenv \
-    && virtualenv /opt/cn_p2_simple_ws/venv \
-    && . /opt/cn_p2_simple_ws/venv/bin/activate \
-    && pip install gunicorn
+WORKDIR /app
 
-COPY . /opt/cn_p2_simple_ws
+COPY requirements.txt ./
 
-WORKDIR /opt/cn_p2_simple_ws
+RUN pip install -r requirements.txt
 
-RUN . /opt/cn_p2_simple_ws/venv/bin/activate \
-    && pip install .
+COPY . .
 
-FROM python:3.11-slim
+EXPOSE 4000
 
-COPY --from=build /opt/cn_p2_simple_ws /opt/cn_p2_simple_ws
-COPY entrypoint.sh /bin/entrypoint.sh
-
-RUN apt-get update -y \
-    && apt-get install -y libpq5\
-    && apt-get clean \
-    && groupadd -g 5000 -r wsuser \
-    && useradd -r -M -u 5000 -g wsuser wsuser \
-    && chown -R wsuser:wsuser /opt/cn_p2_simple_ws \
-    && chmod +x /bin/entrypoint.sh
-
-WORKDIR /opt/cn_p2_simple_ws
-USER wsuser:wsuser
-
-EXPOSE 8000
-
-ENTRYPOINT ["entrypoint.sh"]
+CMD [ "flask", "run", "--host=0.0.0.0", "--port=4000"]
