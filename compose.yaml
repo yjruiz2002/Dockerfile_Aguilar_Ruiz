@@ -1,41 +1,28 @@
-version: '3.9'
+version: "3.9"
 
 services:
-  postgres-db:
-    image: 'postgres:15.0-alpine'
+  flask_app:
+    container_name: flask_app
     restart: always
-    environment:
-      POSTGRES_DB: cnp2_database
-      POSTGRES_USER: cnp2_user
-      POSTGRES_PASSWORD: my_cool_secret_2
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - cnp2_net
-    healthcheck:
-      test: ["CMD", "pg_isready"]
-      start_period: 30s
-
-  cnp2-app:
+    image: francescoxx/flask_live_app:1.0.0
     build: .
-    restart: always
     ports:
-      - 8083:8000
+      - "4000:4000"
     environment:
-      FLASK_DATABASE_NAME: cnp2_database
-      FLASK_DATABASE_USER: cnp2_user
-      FLASK_DATABASE_PASSWORD: my_cool_secret_2
-      FLASK_DATABASE_HOST: postgres-db
-      FLASK_ALLOWED_HOSTS: '*'
-    networks:
-      - cnp2_net
+      - DB_URL=postgresql://postgres:postgres@flask_db:5432/postgres
     depends_on:
-      postgres-db:
-        condition: service_healthy
-        restart: true
+      - flask_db
+  flask_db:
+    container_name: flask_db
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
-
-networks:
-  cnp2_net:
+  pgdata: {}

@@ -1,36 +1,20 @@
-FROM python:3.11-slim as build
+# Utilizamos la imagen base de Python 3.9
+FROM python:3.9
 
-RUN apt-get update -y \
-    && apt-get install -y build-essential libpq-dev git \
-    && pip install virtualenv \
-    && virtualenv /opt/cn_p2_simple_ws/venv \
-    && . /opt/cn_p2_simple_ws/venv/bin/activate \
-    && pip install gunicorn
+# Establecemos el directorio de trabajo dentro del contenedor como /app
+WORKDIR /app
 
-COPY . /cn_p2_simple_ws
+# Copiamos el archivo requirements.txt al directorio de trabajo
+COPY requirements.txt ./
 
-WORKDIR /cn_p2_simple_ws
+# Instalamos las dependencias definidas en requirements.txt
+RUN pip install -r requirements.txt
 
-RUN . /opt/cn_p2_simple_ws/venv/bin/activate \
-    && pip install .
+# Copiamos el contenido actual del directorio de construcción al directorio de trabajo en el contenedor
+COPY . .
 
-FROM python:3.11-slim
+# Exponemos el puerto 5000 para que pueda ser accesible desde fuera del contenedor
+EXPOSE 5000
 
-COPY --from=build /opt/cn_p2_simple_ws /opt/cn_p2_simple_ws
-COPY entrypoint.sh /bin/entrypoint.sh
-
-RUN apt-get update -y \
-    && apt-get install -y libpq5\
-    && apt-get clean \
-    && groupadd -g 5000 -r wsuser \
-    && useradd -r -M -u 5000 -g wsuser wsuser \
-    && chown -R wsuser:wsuser /opt/cn_p2_simple_ws \
-    && chmod +x /bin/entrypoint.sh
-    
-
-WORKDIR /opt/cn_p2_simple_ws
-USER wsuser:wsuser
-
-EXPOSE 8000
-
-ENTRYPOINT ["entrypoint.sh"]
+# Definimos el comando que se ejecutará cuando se inicie el contenedor
+CMD [ "flask", "run", "--host=0.0.0.0", "--port=4000"]
