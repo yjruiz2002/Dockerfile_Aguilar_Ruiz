@@ -1,4 +1,4 @@
-APP_NAME="AguilarRuiz"
+APP_NAME="aguilarruiz"
 DB_PWD="postgres"
-DOMAIN_NAME="AguilarRuiz.okd-dev.ucab.edu.ve"
+DOMAIN_NAME="aguilarruiz.okd-dev.ucab.edu.ve"
 PROJECT_NAME="pj-maaguilar-20"
