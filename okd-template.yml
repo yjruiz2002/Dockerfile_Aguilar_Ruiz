@@ -202,7 +202,7 @@ objects:
               imagePullPolicy: Always
               name: appserver
               env:
-                - name: FLASK_DATABASES_DEFAULT_URL
+                - name: DB_URL
                   valueFrom:
                     secretKeyRef:
                       name: "${APP_NAME}-keys"
